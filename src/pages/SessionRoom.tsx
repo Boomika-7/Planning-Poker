@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useParticipants } from "../hooks/useParticipants";
 import { useAuthUser } from "../hooks/useAuthUser";
@@ -9,6 +9,10 @@ import { deleteSession } from "../services/deleteSession";
 import { restartSession } from "../services/restartSession";
 import { ParticipantCard } from "../components/ParticipantCard";
 import { useSession } from "../hooks/useSession";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth, db } from "../services/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import LoadingScreen from "../components/LoadingScreen";
 
 function IconAction({
   label,
@@ -33,6 +37,7 @@ function IconAction({
 export const SessionRoom = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
 
+  const [initialLoading, setLoading] = useState(true)
   const { user, loading } = useAuthUser();
 
   const normalizedSessionId = useMemo(
@@ -41,20 +46,20 @@ export const SessionRoom = () => {
   );
 
   const participants = useParticipants(normalizedSessionId);
-  const currentParticipant = user ? participants.find((p) => p.id === user.uid) : undefined;
+  const currentParticipant = user
+    ? participants.find((p) => p.id === user.uid)
+    : undefined;
 
   const isHost = currentParticipant?.isHost ?? false;
 
   const [copied, setCopied] = useState(false);
 
-  const inviteUrl = `${window.location.origin}/session/${sessionId}`;
-
   const session = useSession(normalizedSessionId);
-const votesRevealed = session?.revealVotes ?? false;
+  const votesRevealed = session?.revealVotes ?? false;
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(inviteUrl);
+      await navigator.clipboard.writeText(normalizedSessionId);
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
@@ -90,8 +95,52 @@ const votesRevealed = session?.revealVotes ?? false;
     }
   };
 
-  if (loading) {
-    return <div>Connecting...</div>;
+  useEffect(() => {
+    if (!normalizedSessionId) {
+      navigate("/");
+      return;
+    }
+
+    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+      if (!authUser) {
+        navigate("/");
+        return;
+      }
+
+      try {
+        const sessionRef = doc(db, "sessions", normalizedSessionId);
+        const sessionSnap = await getDoc(sessionRef);
+
+        if (!sessionSnap.exists()) {
+          navigate("/");
+          return;
+        }
+
+        const participantRef = doc(
+          db,
+          "sessions",
+          normalizedSessionId,
+          "participants",
+          authUser.uid,
+        );
+
+        const participantSnap = await getDoc(participantRef);
+
+        if (!participantSnap.exists()) {
+          navigate("/");
+        }
+        setLoading(false)
+      } catch (error) {
+        console.error("Session validation error:", error);
+        navigate("/");
+      }
+    });
+
+    return () => unsubscribe();
+  }, [navigate, normalizedSessionId]);
+
+  if (loading || initialLoading) {
+    return <LoadingScreen />
   }
 
   if (!user) {
@@ -140,15 +189,15 @@ const votesRevealed = session?.revealVotes ?? false;
         </h2>
         <div className="flex flex-wrap gap-6 justify-center">
           {participants.map((p) => (
-  <ParticipantCard
-    key={p.id}
-    name={p.name}
-    vote={p.vote}
-    voted={Boolean(p.vote)}
-    isHost={p.isHost}
-    revealVotes={votesRevealed}
-  />
-))}
+            <ParticipantCard
+              key={p.id}
+              name={p.name}
+              vote={p.vote}
+              voted={Boolean(p.vote)}
+              isHost={p.isHost}
+              revealVotes={votesRevealed}
+            />
+          ))}
         </div>
       </section>
 

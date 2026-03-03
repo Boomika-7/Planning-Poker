@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { joinSession } from "../services/joinSession";
 import { createSession } from "../services/createSession";
 import { useAuthUser } from "../hooks/useAuthUser";
+import LoadingScreen from "../components/LoadingScreen";
 
 type Participant = {
   uid: string;
@@ -100,7 +101,7 @@ export default function Home() {
     setError("");
   };
 
-  if (loading) return <div>Connecting...</div>;
+  if (loading) return <LoadingScreen />
   if (!user) return <div>Authentication failed</div>;
 
   return (
