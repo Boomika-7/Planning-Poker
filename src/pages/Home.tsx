@@ -13,16 +13,13 @@ type Participant = {
 
 export default function Home() {
   const [rightActive, setRightActive] = useState(false);
-
-  const { user, loading } = useAuthUser();
-  // Shared inputs
   const [sessionName, setSessionName] = useState("");
   const [joinCode, setJoinCode] = useState("");
   const [userName, setUserName] = useState("");
-
-  // Behavior state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  const { user, loading } = useAuthUser();
 
   const navigate = useNavigate();
 
@@ -47,7 +44,7 @@ export default function Home() {
 
     try {
       const userDetails: Participant = {
-        uid: user!.uid,
+        uid: user.uid,
         name: trimmedUserName,
       };
 
@@ -81,7 +78,7 @@ export default function Home() {
 
     try {
       const userDetails: Participant = {
-        uid: user!.uid,
+        uid: user.uid,
         name: trimmedName,
       };
 
@@ -101,19 +98,19 @@ export default function Home() {
     setError("");
   };
 
-  if (loading) return <LoadingScreen />
+  if (loading) return <LoadingScreen />;
   if (!user) return <div>Authentication failed</div>;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950">
+    <div className="p-8 sm:p-0 min-h-screen flex items-center justify-center bg-slate-950">
       <div
         id="container"
-        className={`container relative overflow-hidden bg-white rounded-xl shadow-2xl w-[780px] max-w-full min-h-[480px] transition-all duration-500 ${
+        className={`container relative overflow-hidden bg-white rounded-xl shadow-2xl w-full max-w-[380px] md:max-w-full md:w-[780px] min-h-[640px] md:min-h-[480px] transition-all duration-500 ${
           rightActive ? "right-panel-active" : ""
         }`}
       >
         {/* Create (left) */}
-        <div className={`form-container sign-in-container absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-8 transition-all duration-600 ${rightActive ? "hidden" : ""}`}>
+        <div className={`form-container sign-in-container absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-6 md:p-8 transition-all duration-600 ${rightActive ? "hidden" : ""}`}>
           <form className="w-full space-y-4" onSubmit={handleCreate}>
             <h1 className="text-3xl font-bold">Create Room</h1>
             <p className="text-sm text-slate-500">
@@ -169,7 +166,7 @@ export default function Home() {
         </div>
 
         {/* Join (right) */}
-        <div className="form-container sign-up-container absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-8 transition-all duration-600">
+        <div className="form-container sign-up-container absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-6 md:p-8 transition-all duration-600">
           <form className="w-full space-y-4" onSubmit={handleJoin}>
             <h1 className="text-3xl font-bold">Join Room</h1>
             <p className="text-sm text-slate-500">

@@ -9,13 +9,13 @@ export const ParticipantCard = ({
   revealVotes,
 }: ParticipantCardProps) => {
   return (
-    <div className="relative min-w-[150px] rounded-2xl bg-[#11254a] p-5 border border-blue-500">
+    <div className="relative min-w-[150px] rounded-2xl bg-[#11254a] p-3 sm:p-5 border border-blue-500">
         {isHost && (
           <div className="absolute right-0 top-0 p-1.5">
             <Crown className="h-4 w-4 text-amber-300 fill-amber-300" />
           </div>
         )}
-        <div className="text-center mt-1">
+        <div className="text-center sm:mt-1">
           <p className="text-xl font-semibold text-slate-100">
             {name.toUpperCase()}
           </p>

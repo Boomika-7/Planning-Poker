@@ -26,7 +26,7 @@ function IconAction({
   return (
     <button
       onClick={onClick}
-      className="group flex items-center gap-2 rounded-xl px-3 py-2 border border-white/20 bg-white/10 transition hover:bg-white/10 active:scale-95"
+      className="group flex items-center gap-2 rounded-xl px-2 sm:px-3 py-2 border border-white/20 bg-white/10 transition hover:bg-white/10 active:scale-95"
       title={label}
     >
       <span>{icon}</span>
@@ -150,44 +150,44 @@ export const SessionRoom = () => {
   return (
     <div className="min-h-screen bg-[#0B1020] text-slate-100 flex flex-col justify-between">
       {/* Top */}
-      <div className="flex items-center justify-between gap-4 px-8 pt-8">
+      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 px-4 sm:px-8 pt-8">
         <span className="font-semibold tracking-wider rounded-2xl border border-white/30 bg-white/10 px-4 py-2 shadow-lg backdrop-blur">
           Room ID: {normalizedSessionId}
         </span>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           {isHost && (
             <IconAction
               label="Restart"
               onClick={handleRestart}
-              icon={<RotateCcw className="h-5 w-5 text-yellow-500" />}
+              icon={<RotateCcw className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-500" />}
             />
           )}
           <IconAction
             label="Exit"
             onClick={handleExit}
-            icon={<LogOut className="h-5 w-5 text-orange-500" />}
+            icon={<LogOut className="h-3 w-3 sm:h-5 sm:w-5 text-orange-500" />}
           />
           {isHost && (
             <IconAction
               label="Delete"
               onClick={handleDelete}
-              icon={<Trash className="h-5 w-5 text-red-500" />}
+              icon={<Trash className="h-3 w-3 sm:h-5 sm:w-5 text-red-500" />}
             />
           )}
           <IconAction
             label={copied ? "Copied" : "Invite"}
             onClick={handleCopy}
-            icon={<Copy className="h-5 w-5 text-blue-500" />}
+            icon={<Copy className="h-3 w-3 sm:h-5 sm:w-5 text-blue-500" />}
           />
         </div>
       </div>
 
       {/* Participants */}
-      <section className="px-8 pt-8 space-y-6">
-        <h2 className="text-xl font-semibold tracking-tight text-slate-100 text-center">
+      <section className="px-4 pt-4 space-y-4 sm:px-8 sm:pt-8 sm:space-y-6">
+        <h2 className="text-base sm:text-xl font-semibold tracking-tight text-slate-100 text-center">
           Participants
         </h2>
-        <div className="flex flex-wrap gap-6 justify-center">
+        <div className="flex flex-wrap gap-4 sm:gap-6 justify-center">
           {participants.map((p) => (
             <ParticipantCard
               key={p.id}
