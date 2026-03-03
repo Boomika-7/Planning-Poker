@@ -121,7 +121,7 @@ export default function Home() {
               <label className="text-base block mb-1">Room name</label>
               <input
                 className="w-full rounded-md bg-slate-100 px-3 py-2 outline-none text-sm"
-                placeholder="Sprint Planning: 01/01/2026"
+                placeholder="e.g., Sprint Planning: 01/01/2026"
                 value={sessionName}
                 onChange={(e) => setSessionName(e.target.value)}
                 disabled={isSubmitting}

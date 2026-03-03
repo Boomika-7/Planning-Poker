@@ -11,7 +11,7 @@ import { ParticipantCard } from "../components/ParticipantCard";
 import { useSession } from "../hooks/useSession";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../services/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import LoadingScreen from "../components/LoadingScreen";
 
 function IconAction({
@@ -37,7 +37,9 @@ function IconAction({
 export const SessionRoom = () => {
   const { sessionId } = useParams<{ sessionId: string }>();
 
-  const [initialLoading, setLoading] = useState(true)
+  const [initialLoading, setLoading] = useState(true);
+  const [isExiting, setIsExiting] = useState(false);
+
   const { user, loading } = useAuthUser();
 
   const normalizedSessionId = useMemo(
@@ -79,19 +81,23 @@ export const SessionRoom = () => {
 
   const handleDelete = async () => {
     try {
+      setLoading(true);
       await deleteSession(normalizedSessionId);
       navigate("/");
     } catch (err) {
       console.error("Delete failed", err);
+      setLoading(false)
     }
   };
 
   const handleExit = async () => {
     try {
+      setIsExiting(true);
       await exitSession(normalizedSessionId, user!.uid);
       navigate("/");
     } catch (err) {
       console.error("Exit failed", err);
+      setIsExiting(false);
     }
   };
 
@@ -101,7 +107,9 @@ export const SessionRoom = () => {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
+    let sessionUnsubscribe: (() => void) | null = null;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
       if (!authUser) {
         navigate("/");
         return;
@@ -129,18 +137,37 @@ export const SessionRoom = () => {
         if (!participantSnap.exists()) {
           navigate("/");
         }
-        setLoading(false)
+
+        setLoading(false);
+
+        sessionUnsubscribe = onSnapshot(
+          sessionRef,
+          (snapshot) => {
+            if (!snapshot.exists()) {
+              setLoading(true)
+              navigate("/", { replace: true });
+            }
+          },
+          (error) => {
+            console.error("Session listener error:", error);
+            navigate("/", { replace: true });
+            setLoading(false)
+          },
+        );
       } catch (error) {
         console.error("Session validation error:", error);
         navigate("/");
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeAuth();
+      if (sessionUnsubscribe) sessionUnsubscribe();
+    };
   }, [navigate, normalizedSessionId]);
 
-  if (loading || initialLoading) {
-    return <LoadingScreen />
+  if (loading || initialLoading || isExiting) {
+    return <LoadingScreen />;
   }
 
   if (!user) {
@@ -159,7 +186,9 @@ export const SessionRoom = () => {
             <IconAction
               label="Restart"
               onClick={handleRestart}
-              icon={<RotateCcw className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-500" />}
+              icon={
+                <RotateCcw className="h-3 w-3 sm:h-5 sm:w-5 text-yellow-500" />
+              }
             />
           )}
           <IconAction
