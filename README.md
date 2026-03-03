@@ -1,6 +1,6 @@
 # Planning Poker
 
-A real-time Planning Poker web app for Agile teams to estimate stories collaboratively.
+A real-time Planning Poker web app for Agile teams to estimate stories collaboratively. Visit : https://planning-poker-agile-dev.vercel.app/
 
 ## Overview
 
