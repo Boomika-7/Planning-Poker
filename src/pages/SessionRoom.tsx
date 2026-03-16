@@ -13,6 +13,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../services/firebase";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import LoadingScreen from "../components/LoadingScreen";
+import { removeParticipant } from "../services/removeParticipant";
 
 function IconAction({
   label,
@@ -86,7 +87,7 @@ export const SessionRoom = () => {
       navigate("/");
     } catch (err) {
       console.error("Delete failed", err);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
@@ -108,6 +109,7 @@ export const SessionRoom = () => {
     }
 
     let sessionUnsubscribe: (() => void) | null = null;
+    let participantUnsubscribe: (() => void) | null = null;
 
     const unsubscribeAuth = onAuthStateChanged(auth, async (authUser) => {
       if (!authUser) {
@@ -132,11 +134,18 @@ export const SessionRoom = () => {
           authUser.uid,
         );
 
-        const participantSnap = await getDoc(participantRef);
-
-        if (!participantSnap.exists()) {
-          navigate("/");
-        }
+        participantUnsubscribe = onSnapshot(
+          participantRef,
+          (snap) => {
+            if (!snap.exists()) {
+              navigate("/", { replace: true });
+            }
+          },
+          (error) => {
+            console.error("Participant listener error:", error);
+            navigate("/", { replace: true });
+          },
+        );
 
         setLoading(false);
 
@@ -144,14 +153,14 @@ export const SessionRoom = () => {
           sessionRef,
           (snapshot) => {
             if (!snapshot.exists()) {
-              setLoading(true)
+              setLoading(true);
               navigate("/", { replace: true });
             }
           },
           (error) => {
             console.error("Session listener error:", error);
             navigate("/", { replace: true });
-            setLoading(false)
+            setLoading(false);
           },
         );
       } catch (error) {
@@ -163,6 +172,7 @@ export const SessionRoom = () => {
     return () => {
       unsubscribeAuth();
       if (sessionUnsubscribe) sessionUnsubscribe();
+      if (participantUnsubscribe) participantUnsubscribe();
     };
   }, [navigate, normalizedSessionId]);
 
@@ -225,6 +235,8 @@ export const SessionRoom = () => {
               voted={Boolean(p.vote)}
               isHost={p.isHost}
               revealVotes={votesRevealed}
+              currentUserIsHost={isHost}
+              onRemove={() => removeParticipant(normalizedSessionId, p.id)}
             />
           ))}
         </div>

@@ -1,5 +1,12 @@
-import { CheckIcon, CircleDashed, Crown } from "lucide-react";
+import {
+  CheckIcon,
+  CircleDashed,
+  Crown,
+  EllipsisVertical,
+  X,
+} from "lucide-react";
 import type { ParticipantCardProps } from "../types";
+import { useState } from "react";
 
 export const ParticipantCard = ({
   name,
@@ -7,34 +14,80 @@ export const ParticipantCard = ({
   voted,
   isHost,
   revealVotes,
+  currentUserIsHost,
+  onRemove,
 }: ParticipantCardProps) => {
+  const [isClicked, setIsClicked] = useState(false);
+  const canRemove = currentUserIsHost && !isHost;
+
+  const handleClick = () => {
+    setIsClicked((prev) => !prev);
+  };
+
   return (
-    <div className="relative min-w-[150px] rounded-2xl bg-[#11254a] p-3 sm:p-5 border border-blue-500">
-        {isHost && (
-          <div className="absolute right-0 top-0 p-1.5">
-            <Crown className="h-4 w-4 text-amber-300 fill-amber-300" />
-          </div>
-        )}
+    <div className="flex items-center justify-center relative min-w-[150px] rounded-2xl bg-[#11254a] p-3 sm:p-5 border border-blue-500">
+      {isHost && (
+        <div className="absolute right-0 top-0 p-1.5">
+          <Crown className="h-4 w-4 text-amber-300 fill-amber-300" />
+        </div>
+      )}
+
+      {canRemove &&
+        (isClicked ? (
+          <button
+            onClick={handleClick}
+            className="absolute right-0 top-0 p-1.5"
+          >
+            <X className="h-4 w-4 text-amber-300" />
+          </button>
+        ) : (
+          <button
+            onClick={handleClick}
+            className="absolute right-0 top-0 p-1.5"
+          >
+            <EllipsisVertical className="h-4 w-4 text-amber-300" />
+          </button>
+        ))}
+
+      {isClicked && canRemove && (
+        <button
+          onClick={onRemove}
+          className="text-xl font-semibold text-red-500"
+        >
+          <span>
+            Remove
+            <br />
+            Participant
+          </span>
+        </button>
+      )}
+
+      {!isClicked && (
         <div className="text-center sm:mt-1">
           <p className="text-xl font-semibold text-slate-100">
             {name.toUpperCase()}
           </p>
-          {!revealVotes && (<div className={`mt-4 mx-auto w-fit rounded-full px-5 py-2 inline-flex items-center gap-2 border backdrop-blur ${voted ? "bg-emerald-500/15 border-emerald-400/20 text-emerald-100" : "bg-yellow-500/15 border-yellow-400/10 text-yellow-200"}`}>
-            {voted ? (
-              <CheckIcon className="h-5 w-5" />
-            ) : (
-              <CircleDashed className="h-5 w-5" />
-            )}
-            <span className="text-sm font-medium">
-              {voted ? "Voted" : "Waiting"}
-            </span>
-          </div>)}
+          {!revealVotes && (
+            <div
+              className={`mt-4 mx-auto w-fit rounded-full px-5 py-2 inline-flex items-center gap-2 border backdrop-blur ${voted ? "bg-emerald-500/15 border-emerald-400/20 text-emerald-100" : "bg-yellow-500/15 border-yellow-400/10 text-yellow-200"}`}
+            >
+              {voted ? (
+                <CheckIcon className="h-5 w-5" />
+              ) : (
+                <CircleDashed className="h-5 w-5" />
+              )}
+              <span className="text-sm font-medium">
+                {voted ? "Voted" : "Not Voted"}
+              </span>
+            </div>
+          )}
           {revealVotes && (
             <div className="mt-3 text-3xl font-bold text-emerald-200">
               {vote}
             </div>
           )}
         </div>
+      )}
     </div>
   );
-}
+};
