@@ -12,9 +12,10 @@ type Participant = {
 };
 
 export default function Home() {
-  const [rightActive, setRightActive] = useState(false);
+  const invitedSessionId = new URLSearchParams(window.location.search).get("sessionId") ?? "";
+  const [rightActive, setRightActive] = useState(Boolean(invitedSessionId));
   const [sessionName, setSessionName] = useState("");
-  const [joinCode, setJoinCode] = useState("");
+  const [joinCode, setJoinCode] = useState(invitedSessionId);
   const [userName, setUserName] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -66,7 +67,15 @@ export default function Home() {
       return;
     }
 
-    const trimmedSessionId = joinCode.trim().toUpperCase();
+    const enteredJoinValue = joinCode.trim();
+    let trimmedSessionId = enteredJoinValue.toUpperCase();
+    try {
+      const inviteUrl = new URL(enteredJoinValue);
+      const match = inviteUrl.pathname.match(/\/session\/([^/]+)/i);
+      if (match) trimmedSessionId = decodeURIComponent(match[1]).toUpperCase();
+    } catch {
+      // A room code was entered instead of a full invite URL.
+    }
     const trimmedName = userName.trim();
 
     if (!trimmedSessionId || !trimmedName) {

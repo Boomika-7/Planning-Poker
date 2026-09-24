@@ -62,7 +62,9 @@ export const SessionRoom = () => {
 
   const handleCopy = async () => {
     try {
-      await navigator.clipboard.writeText(normalizedSessionId);
+      const inviteUrl = new URL("/", window.location.origin);
+      inviteUrl.searchParams.set("sessionId", normalizedSessionId);
+      await navigator.clipboard.writeText(inviteUrl.toString());
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
     } catch (err) {
