@@ -48,6 +48,9 @@ Users are authenticated with Firebase Anonymous Auth, and all room/participant u
 - `/` -> Home page (Create/Join UI)
 - `/session/:sessionId` -> Session room
 
+Vercel rewrites app routes to `index.html` so direct visits and page reloads
+reach React Router instead of returning a hosting-level 404.
+
 ## Firestore Data Model
 
 ### Collection: `sessions`
