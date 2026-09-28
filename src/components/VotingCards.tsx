@@ -3,15 +3,22 @@ import { doc, onSnapshot } from "firebase/firestore";
 import { db } from "../services/firebase";
 import type { User } from "firebase/auth";
 import { setVote } from "../services/setVote";
+import { useSession } from "../hooks/useSession";
 
 type Props = {
   sessionId: string;
   user: User;
 };
 
-const votingOptions = ["1", "2", "3", "5", "8", "13"];
+const votingSeries = {
+  fibonacci: ["0", "1", "2", "3", "5", "8", "13", "?"],
+  sequential: ["1", "2", "3", "4", "5", "6", "7", "8", "?"],
+  "t-shirt": ["XS", "S", "M", "L", "XL", "XXL", "?"],
+} as const;
 
 export default function VotingCards({ sessionId, user }: Props) {
+  const session = useSession(sessionId);
+  const votingOptions = votingSeries[session?.series ?? "fibonacci"];
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
   const [confirmedVote, setConfirmedVote] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);

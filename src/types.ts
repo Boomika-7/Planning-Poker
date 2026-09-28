@@ -11,6 +11,7 @@ export type Session = {
   hostName: string;
   createdAt: Timestamp;
   revealVotes: boolean;
+  series?: "fibonacci" | "sequential" | "t-shirt";
 };
 
 export type ParticipantCardProps = {

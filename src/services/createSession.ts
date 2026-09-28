@@ -21,7 +21,7 @@ const generateUniqueSessionId = async () => {
   throw new Error("Unable to generate a unique session ID")
 }
 
-export const createSession = async (sessionName: string, user: SessionUser) => {
+export const createSession = async (sessionName: string, user: SessionUser, series = "fibonacci") => {
   const sessionId = await generateUniqueSessionId()
   const batch = writeBatch(db)
 
@@ -29,6 +29,7 @@ export const createSession = async (sessionName: string, user: SessionUser) => {
     name: sessionName,
     hostId: user.uid,
     hostName: user.name,
+    series,
     revealVotes: false,
     createdAt: serverTimestamp(),
   })

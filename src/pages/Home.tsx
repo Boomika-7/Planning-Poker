@@ -5,6 +5,7 @@ import { joinSession } from "../services/joinSession";
 import { createSession } from "../services/createSession";
 import { useAuthUser } from "../hooks/useAuthUser";
 import LoadingScreen from "../components/LoadingScreen";
+import { ChevronDown } from "lucide-react";
 
 type Participant = {
   uid: string;
@@ -17,6 +18,7 @@ export default function Home() {
   const [sessionName, setSessionName] = useState("");
   const [joinCode, setJoinCode] = useState(invitedSessionId);
   const [userName, setUserName] = useState("");
+  const [series, setSeries] = useState("fibonacci");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
@@ -49,7 +51,11 @@ export default function Home() {
         name: trimmedUserName,
       };
 
-      const sessionId = await createSession(trimmedSessionName, userDetails);
+      const sessionId = await createSession(
+        trimmedSessionName,
+        userDetails,
+        series,
+      );
       navigate(`/session/${sessionId}`);
     } catch {
       setError("Failed to create session. Please try again.");
@@ -119,7 +125,9 @@ export default function Home() {
         }`}
       >
         {/* Create (left) */}
-        <div className={`form-container sign-in-container absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-6 md:p-8 transition-all duration-600 ${rightActive ? "hidden" : ""}`}>
+        <div
+          className={`form-container sign-in-container absolute top-0 left-0 w-1/2 h-full flex items-center justify-center p-6 md:p-8 transition-all duration-600 ${rightActive ? "hidden" : ""}`}
+        >
           <form className="w-full space-y-4" onSubmit={handleCreate}>
             <h1 className="text-3xl font-bold">Create Room</h1>
             <p className="text-sm text-slate-500">
@@ -129,7 +137,7 @@ export default function Home() {
             <div>
               <label className="text-base block mb-1">Room name</label>
               <input
-                className="w-full rounded-md bg-slate-100 px-3 py-2 outline-none text-sm"
+                className="w-full rounded-md bg-slate-200 px-3 py-2 outline-none text-sm"
                 placeholder="e.g., Sprint Planning: 01/01/2026"
                 value={sessionName}
                 onChange={(e) => setSessionName(e.target.value)}
@@ -140,12 +148,31 @@ export default function Home() {
             <div>
               <label className="text-base block mb-1">Your name</label>
               <input
-                className="w-full rounded-md bg-slate-100 px-3 py-2 outline-none text-sm"
+                className="w-full rounded-md bg-slate-200 px-3 py-2 outline-none text-sm"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="e.g., Alice"
                 disabled={isSubmitting}
               />
+            </div>
+            <div>
+              <label className="text-base block mb-1">Series</label>
+              <div className="relative">
+                <select
+                  className="w-full appearance-none rounded-md bg-slate-200 px-3 py-2.5 pr-10 text-sm outline-none"
+                  value={series}
+                  onChange={(e) => setSeries(e.target.value)}
+                  disabled={isSubmitting}
+                >
+                  <option value="fibonacci">Fibonacci</option>
+                  <option value="sequential">Sequential</option>
+                  <option value="t-shirt">T-Shirt Size</option>
+                </select>
+                <ChevronDown
+                  aria-hidden="true"
+                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500"
+                />
+              </div>
             </div>
 
             <div className="pt-4 flex justify-between items-center">
