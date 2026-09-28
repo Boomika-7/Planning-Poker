@@ -2,6 +2,8 @@ import { doc, getDoc, serverTimestamp, writeBatch } from "firebase/firestore"
 import { db } from "./firebase"
 import type { SessionUser } from "../types"
 
+const SESSION_TTL_MS = 12 * 60 * 60 * 1000
+
 const SESSION_ID_LENGTH = 6
 const MAX_SESSION_ID_ATTEMPTS = 10
 
@@ -32,6 +34,7 @@ export const createSession = async (sessionName: string, user: SessionUser, seri
     series,
     revealVotes: false,
     createdAt: serverTimestamp(),
+    expiresAt: new Date(Date.now() + SESSION_TTL_MS),
   })
 
   batch.set(doc(db, "sessions", sessionId, "participants", user.uid), {

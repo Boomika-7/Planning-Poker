@@ -63,6 +63,7 @@ Fields:
 - `hostName: string`
 - `revealVotes: boolean`
 - `createdAt: Timestamp`
+- `expiresAt: Timestamp` (12 hours after creation)
 
 ### Subcollection: `sessions/{sessionId}/participants`
 
@@ -73,3 +74,11 @@ Fields:
 - `isHost: boolean`
 - `vote: string | null`
 - `joinedAt: Timestamp`
+
+## Automatic session cleanup
+
+Sessions expire 12 hours after creation. The scheduled GitHub Actions workflow
+`.github/workflows/cleanup-expired-sessions.yml` runs every 12 hpurs and uses
+the Firebase Admin SDK to remove expired sessions and their participant
+subcollections. GitHub's scheduler can run a little late, so deletion happens
+on the first successful run after the 12-hour expiry time.
