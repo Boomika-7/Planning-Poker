@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { joinSession } from "../services/joinSession";
 import { createSession } from "../services/createSession";
@@ -13,7 +13,9 @@ type Participant = {
 };
 
 export default function Home() {
-  const invitedSessionId = new URLSearchParams(window.location.search).get("sessionId") ?? "";
+  const [invitedSessionId, setInvitedSessionId] = useState(
+    () => new URLSearchParams(window.location.search).get("sessionId") ?? "",
+  );
   const [rightActive, setRightActive] = useState(Boolean(invitedSessionId));
   const [sessionName, setSessionName] = useState("");
   const [joinCode, setJoinCode] = useState(invitedSessionId);
@@ -25,6 +27,23 @@ export default function Home() {
   const { user, loading } = useAuthUser();
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if ((location.state as { clearInvite?: boolean } | null)?.clearInvite) {
+      setInvitedSessionId("");
+      setJoinCode("");
+      setRightActive(false);
+      setError("");
+      navigate(location.pathname, { replace: true, state: null });
+      return;
+    }
+
+      const sessionId = new URLSearchParams(location.search).get("sessionId") ?? "";
+      setInvitedSessionId(sessionId);
+      setJoinCode(sessionId);
+      setRightActive(Boolean(sessionId));
+  }, [location.pathname, location.search, location.state, navigate]);
 
   const handleCreate = async (event: React.FormEvent) => {
     event.preventDefault();

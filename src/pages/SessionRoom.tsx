@@ -40,6 +40,7 @@ export const SessionRoom = () => {
 
   const [initialLoading, setLoading] = useState(true);
   const [isExiting, setIsExiting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { user, loading } = useAuthUser();
 
@@ -62,8 +63,7 @@ export const SessionRoom = () => {
 
   const handleCopy = async () => {
     try {
-      const inviteUrl = new URL("/", window.location.origin);
-      inviteUrl.searchParams.set("sessionId", normalizedSessionId);
+      const inviteUrl = new URL(`/session/${encodeURIComponent(normalizedSessionId)}`, window.location.origin);
       await navigator.clipboard.writeText(inviteUrl.toString());
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
@@ -84,11 +84,13 @@ export const SessionRoom = () => {
 
   const handleDelete = async () => {
     try {
+      setIsDeleting(true);
       setLoading(true);
       await deleteSession(normalizedSessionId);
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Delete failed", err);
+      setIsDeleting(false);
       setLoading(false);
     }
   };
@@ -97,7 +99,7 @@ export const SessionRoom = () => {
     try {
       setIsExiting(true);
       await exitSession(normalizedSessionId, user!.uid);
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (err) {
       console.error("Exit failed", err);
       setIsExiting(false);
@@ -139,13 +141,15 @@ export const SessionRoom = () => {
         participantUnsubscribe = onSnapshot(
           participantRef,
           (snap) => {
-            if (!snap.exists()) {
-              navigate("/", { replace: true });
+            if (!snap.exists() && !isExiting && !isDeleting) {
+              navigate(`/?sessionId=${encodeURIComponent(normalizedSessionId)}`, { replace: true });
             }
           },
           (error) => {
             console.error("Participant listener error:", error);
-            navigate("/", { replace: true });
+            if (!isExiting && !isDeleting) {
+              navigate(`/?sessionId=${encodeURIComponent(normalizedSessionId)}`, { replace: true });
+            }
           },
         );
 
@@ -176,7 +180,7 @@ export const SessionRoom = () => {
       if (sessionUnsubscribe) sessionUnsubscribe();
       if (participantUnsubscribe) participantUnsubscribe();
     };
-  }, [navigate, normalizedSessionId]);
+  }, [isDeleting, isExiting, navigate, normalizedSessionId]);
 
   if (loading || initialLoading || isExiting) {
     return <LoadingScreen />;
