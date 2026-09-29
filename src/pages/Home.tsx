@@ -248,7 +248,7 @@ export default function Home() {
             </p>
 
             <div>
-              <label className="text-base block mb-1">Room code</label>
+              <label className="text-base block mb-1">Room code / Invite Link</label>
               <input
                 className="w-full rounded-md bg-slate-100 px-3 py-2 outline-none text-sm"
                 value={joinCode}
