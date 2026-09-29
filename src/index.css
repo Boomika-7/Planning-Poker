@@ -76,7 +76,7 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 58%;
+    height: 66%;
   }
 
   .sign-in-container {
@@ -100,10 +100,10 @@
   }
 
   .overlay-container {
-    top: 58%;
+    top: 66%;
     left: 0;
     width: 100%;
-    height: 42%;
+    height: 34%;
   }
 
   .container.right-panel-active .overlay-container {

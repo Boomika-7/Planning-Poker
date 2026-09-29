@@ -136,10 +136,10 @@ export default function Home() {
   if (!user) return <div>Authentication failed</div>;
 
   return (
-    <div className="p-8 sm:p-0 min-h-screen flex items-center justify-center bg-slate-950">
+    <div className="px-4 py-6 sm:p-0 min-h-screen flex items-start sm:items-center justify-center bg-slate-950">
       <div
         id="container"
-        className={`container relative overflow-hidden bg-white rounded-xl shadow-2xl w-full max-w-[380px] md:max-w-full md:w-[780px] min-h-[640px] md:min-h-[480px] transition-all duration-500 ${
+        className={`container relative overflow-hidden bg-white rounded-xl shadow-2xl w-full max-w-[380px] md:max-w-full md:w-[780px] min-h-[680px] md:min-h-[480px] transition-all duration-500 ${
           rightActive ? "right-panel-active" : ""
         }`}
       >
