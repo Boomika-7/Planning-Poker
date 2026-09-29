@@ -59,7 +59,7 @@ export default function VotingCards({ sessionId, user }: Props) {
   };
 
   return (
-    <div className="text-center">
+    <div className="text-center sm:px-8 sm:pt-8">
       <h2 className="text-lg font-semibold tracking-tight text-slate-100">
         Choose your vote
       </h2>

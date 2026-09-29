@@ -94,12 +94,31 @@ export default function Home() {
 
     const enteredJoinValue = joinCode.trim();
     let trimmedSessionId = enteredJoinValue.toUpperCase();
-    try {
-      const inviteUrl = new URL(enteredJoinValue);
-      const match = inviteUrl.pathname.match(/\/session\/([^/]+)/i);
-      if (match) trimmedSessionId = decodeURIComponent(match[1]).toUpperCase();
-    } catch {
-      // A room code was entered instead of a full invite URL.
+    if (enteredJoinValue.includes("://")) {
+      try {
+        const inviteUrl = new URL(enteredJoinValue);
+        const match = inviteUrl.pathname.match(/^\/session\/([^/]+)\/?$/i);
+        if (inviteUrl.origin !== import.meta.env.VITE_APP_URL || !match) {
+          setError("Enter a room code or a valid invite link for this site.");
+          return;
+        }
+        trimmedSessionId = decodeURIComponent(match[1]).toUpperCase();
+      } catch {
+        setError("Enter a valid room code or invite link.");
+        return;
+      }
+    } else if (enteredJoinValue.startsWith("/")) {
+      const match = enteredJoinValue.match(/^\/session\/([^/?#]+)\/?$/i);
+      if (!match) {
+        setError("Enter a room code or a valid invite link.");
+        return;
+      }
+      try {
+        trimmedSessionId = decodeURIComponent(match[1]).toUpperCase();
+      } catch {
+        setError("Enter a valid room code or invite link.");
+        return;
+      }
     }
     const trimmedName = userName.trim();
 

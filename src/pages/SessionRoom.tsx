@@ -63,7 +63,7 @@ export const SessionRoom = () => {
 
   const handleCopy = async () => {
     try {
-      const inviteUrl = new URL(`/session/${encodeURIComponent(normalizedSessionId)}`, window.location.origin);
+      const inviteUrl = new URL(`/session/${encodeURIComponent(normalizedSessionId)}`, import.meta.env.VITE_APP_URL);
       await navigator.clipboard.writeText(inviteUrl.toString());
       setCopied(true);
       setTimeout(() => setCopied(false), 3000);
@@ -193,11 +193,11 @@ export const SessionRoom = () => {
   return (
     <div className="min-h-screen bg-[#0B1020] text-slate-100 flex flex-col justify-between">
       {/* Top */}
-      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 px-4 sm:px-8 pt-8">
+      <section className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4 px-4 sm:px-8 pt-8">
         <span className="font-semibold tracking-wider rounded-2xl border border-white/30 bg-white/10 px-4 py-2 shadow-lg backdrop-blur">
           Room ID: {normalizedSessionId}
         </span>
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
           {isHost && (
             <IconAction
               label="Restart"
@@ -225,7 +225,7 @@ export const SessionRoom = () => {
             icon={<Copy className="h-3 w-3 sm:h-5 sm:w-5 text-blue-500" />}
           />
         </div>
-      </div>
+      </section>
 
       {/* Participants */}
       <section className="px-4 pt-4 space-y-4 sm:px-8 sm:pt-8 sm:space-y-6">
@@ -249,7 +249,7 @@ export const SessionRoom = () => {
       </section>
 
       {/* Voting */}
-      <section className="pb-8">
+      <section className="pb-8 sm:px-8 sm:pt-8 px-4 pt-4">
         <VotingCards sessionId={normalizedSessionId} user={user} />
       </section>
     </div>
